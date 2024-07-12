@@ -143,7 +143,7 @@ function FeaturedCollection({collection}) {
 function RecommendedProducts({products}) {
   return (
     <div className="recommended-products">
-      <h2>Recomended Products</h2>
+      <h2>Catalog</h2>
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={products}>
           {(response) => (
@@ -155,18 +155,16 @@ function RecommendedProducts({products}) {
                       className="recommended-product"
                       to={`/products/${product.handle}`}
                     >
-                      <Image
+                      {/* <Image
                         data={product.images.nodes[0]}
                         aspectRatio="1/1"
                         sizes="(min-width: 45em) 20vw, 50vw"
-                      />
+                      /> */}
                       <h4>{product.title}</h4>
                       <small>
                         <Money data={product.priceRange.minVariantPrice} />
                       </small>
-                      <small>
-                        {product.description}
-                      </small>
+                      <small>{product.id}</small>
                     </Link>
                   ))
                 : null}
