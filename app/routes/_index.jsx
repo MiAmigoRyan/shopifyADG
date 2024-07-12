@@ -1,6 +1,6 @@
 import {defer} from '@shopify/remix-oxygen';
-import {Await, useLoaderData, Link} from '@remix-run/react';
-import {Suspense} from 'react';
+import {Await, useLoaderData, Link, Form, useActionData} from '@remix-run/react';
+import {Suspense, useState} from 'react';
 import {Image, Money} from '@shopify/hydrogen';
 
 /**
@@ -22,6 +22,15 @@ export async function loader(args) {
 
   return defer({...deferredData, ...criticalData});
 }
+
+import { json } from '@shopify/remix-oxygen';
+
+export const action = async ({ request }) => {
+  const formData = await request.formData();
+  const address = formData.get('address');
+
+  return json({ address });
+};
 
 /**
  * Load data necessary for rendering content above the fold. This is the critical data
@@ -62,13 +71,46 @@ function loadDeferredData({context}) {
 export default function Homepage() {
   /** @type {LoaderReturnData} */
   const data = useLoaderData();
+  const actionData = useActionData();
+  const [address, setAddress] = useState(actionData?.address || '');
+
+  const handleInput = (event) => {
+    setAddress(event.target.value);
+  };
+
   return (
     <div className="home">
+      <Form method="POST">
+        <label htmlFor='address'>ENTER ADDRESS</label>
+        <input 
+          type='text'
+          id='address'
+          name='address'
+          value={address}
+          onChange={handleInput}
+          />
+          <button type='submit'>show offers</button>
+      </Form>
+
+      {actionData &&(
+        <div>
+          <h2>{actionData.address}</h2>
+        </div>
+      )}
+
       <FeaturedCollection collection={data.featuredCollection} />
       <RecommendedProducts products={data.recommendedProducts} />
     </div>
   );
 }
+
+/**
+ * @param {{
+ *   AddressSearchForm;
+ * }}
+ */
+
+<Form>Address Search</Form>
 
 /**
  * @param {{
@@ -101,7 +143,7 @@ function FeaturedCollection({collection}) {
 function RecommendedProducts({products}) {
   return (
     <div className="recommended-products">
-      <h2>Recommended Products</h2>
+      <h2>Recomended Products</h2>
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={products}>
           {(response) => (
@@ -121,6 +163,9 @@ function RecommendedProducts({products}) {
                       <h4>{product.title}</h4>
                       <small>
                         <Money data={product.priceRange.minVariantPrice} />
+                      </small>
+                      <small>
+                        {product.description}
                       </small>
                     </Link>
                   ))

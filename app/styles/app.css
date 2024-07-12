@@ -12,6 +12,11 @@ img {
   border-radius: 4px;
 }
 
+body {
+  background:darkseagreen;
+  color:#fff;
+}
+
 /*
 * --------------------------------------------------
 * components/Aside
